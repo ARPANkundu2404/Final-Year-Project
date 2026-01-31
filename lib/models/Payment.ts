@@ -69,6 +69,10 @@ const PaymentSchema = new Schema<IPayment>(
     razorpaySignature: {
       type: String,
     },
+    stripePaymentIntentId: {
+      type: String,
+      sparse: true,
+    },
     transactionId: {
       type: String,
     },
