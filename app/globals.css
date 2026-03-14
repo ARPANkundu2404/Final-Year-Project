@@ -1,0 +1,345 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════
+   ZERO-FLICKER THEME SYSTEM
+   Strategy: CSS custom properties defined on :root (light)
+   and html.dark (dark). next-themes sets the class before
+   first paint by injecting a blocking script → no FOUC.
+═══════════════════════════════════════════════════════ */
+
+/* ── Pearl Theme (Light) ─────────────────────────────── */
+:root {
+  /* Surfaces */
+  --bg:              #F8FAFC;
+  --bg-mesh-1:       #EEF2FF;
+  --bg-mesh-2:       #F0FDF4;
+  --bg-mesh-3:       #FFF7ED;
+  --surface:         rgba(255, 255, 255, 0.72);
+  --surface-raised:  rgba(255, 255, 255, 0.92);
+  --surface-hover:   rgba(255, 255, 255, 0.95);
+
+  /* Borders */
+  --border:          rgba(30, 27, 75, 0.08);
+  --border-strong:   rgba(30, 27, 75, 0.14);
+  --border-focus:    rgba(99, 102, 241, 0.5);
+
+  /* Text */
+  --text-primary:    #1E1B4B;
+  --text-secondary:  #475569;
+  --text-muted:      #94A3B8;
+  --text-inverse:    #F8FAFC;
+
+  /* Brand accents */
+  --accent-available: #10B981;
+  --accent-glow:      rgba(16, 185, 129, 0.18);
+  --accent-occupied:  #94A3B8;
+  --accent-rec:       #F59E0B;
+  --accent-rec-glow:  rgba(245, 158, 11, 0.15);
+  --accent-indigo:    #6366F1;
+  --accent-indigo-soft: rgba(99, 102, 241, 0.08);
+
+  /* Mapbox */
+  --mapbox-style: "mapbox://styles/mapbox/navigation-day-v1";
+
+  /* Navigation */
+  --nav-bg:          rgba(248, 250, 252, 0.88);
+  --nav-border:      rgba(30, 27, 75, 0.08);
+  --nav-glow:        none;
+
+  /* Sheet */
+  --sheet-bg:        rgba(255, 255, 255, 0.96);
+  --sheet-shadow:    0 -8px 40px rgba(30, 27, 75, 0.12), 0 -2px 12px rgba(30, 27, 75, 0.06);
+
+  /* QR Ticket */
+  --ticket-bg:       #ffffff;
+  --ticket-border:   rgba(30, 27, 75, 0.10);
+  --ticket-header:   linear-gradient(135deg, #EEF2FF 0%, #F0FDF4 100%);
+  --ticket-shadow:   0 8px 32px rgba(30, 27, 75, 0.12);
+
+  /* Loader */
+  --loader-bg:       #F8FAFC;
+}
+
+/* ── Midnight Jewel Theme (Dark) ─────────────────────── */
+html.dark {
+  /* Surfaces */
+  --bg:              #0F172A;
+  --bg-mesh-1:       #1E1B4B;
+  --bg-mesh-2:       #0f2030;
+  --bg-mesh-3:       #1a1040;
+  --surface:         rgba(30, 41, 59, 0.70);
+  --surface-raised:  rgba(30, 41, 59, 0.90);
+  --surface-hover:   rgba(30, 41, 59, 0.95);
+
+  /* Borders */
+  --border:          rgba(255, 255, 255, 0.07);
+  --border-strong:   rgba(255, 255, 255, 0.12);
+  --border-focus:    rgba(45, 212, 191, 0.5);
+
+  /* Text */
+  --text-primary:    #F1F5F9;
+  --text-secondary:  #94A3B8;
+  --text-muted:      #475569;
+  --text-inverse:    #0F172A;
+
+  /* Brand accents */
+  --accent-available: #2DD4BF;
+  --accent-glow:      rgba(45, 212, 191, 0.20);
+  --accent-occupied:  #475569;
+  --accent-rec:       #FBBF24;
+  --accent-rec-glow:  rgba(251, 191, 36, 0.15);
+  --accent-indigo:    #818CF8;
+  --accent-indigo-soft: rgba(129, 140, 248, 0.10);
+
+  /* Mapbox */
+  --mapbox-style: "mapbox://styles/mapbox/navigation-night-v1";
+
+  /* Navigation */
+  --nav-bg:          rgba(15, 23, 42, 0.92);
+  --nav-border:      rgba(129, 140, 248, 0.15);
+  --nav-glow:        0 0 0 1px rgba(99, 102, 241, 0.20);
+
+  /* Sheet */
+  --sheet-bg:        rgba(15, 23, 42, 0.95);
+  --sheet-shadow:    0 -8px 40px rgba(0, 0, 0, 0.5), 0 -2px 12px rgba(0, 0, 0, 0.3);
+
+  /* QR Ticket */
+  --ticket-bg:       rgba(30, 41, 59, 0.95);
+  --ticket-border:   rgba(45, 212, 191, 0.25);
+  --ticket-header:   linear-gradient(135deg, #1E1B4B 0%, #0f2030 100%);
+  --ticket-shadow:   0 0 0 1px rgba(45, 212, 191, 0.15), 0 8px 48px rgba(0, 0, 0, 0.5);
+
+  /* Loader */
+  --loader-bg:       #0F172A;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GLOBAL COLOR TRANSITION — 300ms on all elements
+   This is the SINGLE source of the "no flicker, smooth
+   300ms transition" requirement.
+═══════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  transition:
+    background-color 300ms ease,
+    border-color     300ms ease,
+    color            300ms ease,
+    box-shadow       300ms ease,
+    opacity          200ms ease;
+}
+
+/* But NOT transform/layout (would break animations) */
+button, a, [role="button"] {
+  transition:
+    background-color 300ms ease,
+    border-color     300ms ease,
+    color            300ms ease,
+    box-shadow       300ms ease,
+    transform        150ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity          200ms ease;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BASE RESET
+═══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: "Outfit", system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PEARL BACKGROUND — animated mesh gradient
+   Gives the light mode its "premium studio" feel
+═══════════════════════════════════════════════════════ */
+.pearl-bg {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(238,242,255,0.8) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 90%, rgba(240,253,244,0.7) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 60% 40%, rgba(255,247,237,0.4) 0%, transparent 50%);
+  background-size: 200% 200%;
+  animation: meshDrift 18s ease-in-out infinite alternate;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MIDNIGHT JEWEL BACKGROUND — deep space with nebula
+═══════════════════════════════════════════════════════ */
+.midnight-bg {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 70% 50% at 15% 15%, rgba(30,27,75,0.6) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 70% at 85% 85%, rgba(15,32,48,0.8) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 30%, rgba(26,16,64,0.5) 0%, transparent 50%);
+}
+
+@keyframes meshDrift {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   GLASS SURFACE — the core "card" layer
+   Used by sheets, panels, nav bars
+═══════════════════════════════════════════════════════ */
+.glass-surface {
+  background: var(--surface);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border);
+}
+
+.glass-surface-raised {
+  background: var(--surface-raised);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid var(--border-strong);
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLLBARS
+═══════════════════════════════════════════════════════ */
+::-webkit-scrollbar          { width: 3px; height: 3px; }
+::-webkit-scrollbar-track    { background: transparent; }
+::-webkit-scrollbar-thumb    { background: var(--border-strong); border-radius: 99px; }
+
+/* ═══════════════════════════════════════════════════════
+   AUTOFILL — keeps themed background on Chrome
+═══════════════════════════════════════════════════════ */
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-primary);
+  -webkit-box-shadow: 0 0 0 40px var(--surface-raised) inset;
+  caret-color: var(--text-primary);
+  transition: background-color 600000s;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MAPBOX GL OVERRIDES — themed
+═══════════════════════════════════════════════════════ */
+.mapboxgl-map              { width: 100% !important; height: 100% !important; }
+.mapboxgl-canvas-container { width: 100% !important; height: 100% !important; }
+.mapboxgl-canvas           { width: 100% !important; height: 100% !important; }
+
+.mapboxgl-ctrl-bottom-right {
+  bottom: 5.5rem !important;
+  right: 1rem !important;
+}
+@media (min-width: 768px) {
+  .mapboxgl-ctrl-bottom-right {
+    bottom: 1rem !important;
+  }
+}
+
+.mapboxgl-ctrl-group {
+  background: var(--surface) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  box-shadow: none !important;
+}
+
+.mapboxgl-ctrl-group button {
+  background: transparent !important;
+  border: none !important;
+}
+
+:root .mapboxgl-ctrl-group button .mapboxgl-ctrl-icon {
+  filter: invert(0.4) sepia(0.3) saturate(0.8) hue-rotate(200deg);
+}
+
+html.dark .mapboxgl-ctrl-group button .mapboxgl-ctrl-icon {
+  filter: invert(0.85);
+}
+
+.mapboxgl-ctrl-attrib {
+  background: var(--surface) !important;
+  border-radius: 8px !important;
+  font-size: 9px !important;
+  padding: 2px 6px !important;
+  border: 1px solid var(--border) !important;
+}
+
+.mapboxgl-ctrl-attrib a { color: var(--text-muted) !important; }
+
+/* ═══════════════════════════════════════════════════════
+   GLOW EFFECTS — dark mode only
+═══════════════════════════════════════════════════════ */
+html.dark .glow-available {
+  box-shadow: 0 0 0 1px rgba(45,212,191,0.25), 0 0 16px rgba(45,212,191,0.15);
+}
+
+html.dark .glow-indigo {
+  box-shadow: 0 0 0 1px rgba(129,140,248,0.2), 0 0 24px rgba(129,140,248,0.12);
+}
+
+/* ═══════════════════════════════════════════════════════
+   TICKET SPECIFICS
+═══════════════════════════════════════════════════════ */
+.ticket-card {
+  background: var(--ticket-bg);
+  border: 1px solid var(--ticket-border);
+  box-shadow: var(--ticket-shadow);
+  transition: background 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+}
+
+/* Light mode ticket — clean paper pass */
+:root .ticket-card {
+  background: #ffffff;
+}
+
+/* Dark mode ticket — digital card glow */
+html.dark .ticket-card {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(45, 212, 191, 0.25);
+  box-shadow:
+    0 0 0 1px rgba(45, 212, 191, 0.15),
+    0 8px 48px rgba(0, 0, 0, 0.5),
+    inset 0 0 40px rgba(45, 212, 191, 0.03);
+}
+
+/* ═══════════════════════════════════════════════════════
+   UTILITY CLASSES  
+═══════════════════════════════════════════════════════ */
+.font-mono   { font-family: "JetBrains Mono", monospace; }
+.h-dvh       { height: 100dvh; }
+.pb-safe     { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.overscroll-contain { overscroll-behavior: contain; }
+
+/* Theme-aware text classes */
+.text-primary   { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted     { color: var(--text-muted); }
+
+/* Theme-aware available accent */
+.text-available   { color: var(--accent-available); }
+.bg-available-soft { background: var(--accent-glow); }
+
+/* Theme toggle button */
+.theme-toggle {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+html.dark .theme-toggle {
+  box-shadow: 0 0 12px rgba(129, 140, 248, 0.15);
+}
